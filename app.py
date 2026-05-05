@@ -8,10 +8,9 @@ import os
 import sqlite3
 
 # ================= CONFIG =================
-
-ACCESS_TOKEN = "EAAMfxBVMu54BQZChnO8naLT1X0GZBmbK4Gp2fLr9PpMetBkALSvoRmjZCWbfcE15LIS4UhSbRBiUDOJAxcZBOXdoUWdTqq5pOhZAFKWtUCDSmHlKOWChbIuHBX7NDipZB6gGbaNvZCMYAz96MITi46fEHQKWyENPtuqoOAqUOegU6C39wsfLzesvslPyxBs8hINygZDZD"
-PHONE_NUMBER_ID = "948319965041875"
-VERIFY_TOKEN = "agneyra123"
+ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
+PHONE_NUMBER_ID = os.getenv("PHONE_NUMBER_ID")
+VERIFY_TOKEN = os.getenv("VERIFY_TOKEN")
 # ================= INIT =================
 message_queue = queue.Queue()
 app = Flask(__name__)
