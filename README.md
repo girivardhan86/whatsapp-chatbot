@@ -1,26 +1,20 @@
 # WhatsApp AI Bot 🤖
 
-This is a WhatsApp chatbot built using:
-- FastAPI
+This is a WhatsApp chatbot using:
+- Flask
 - LangChain
-- Ollama (local LLM)
-- ChromaDB
+- Ollama (TinyLlama)
+- Chroma DB
 
 ## Features
-- AI responses
-- Internship & company info
-- Memory-based conversation
-- WhatsApp integration
+- Auto reply
+- Admin panel
+- Memory storage
+- Vector search
 
-## Setup
+## Run Project
 
-1. Install requirements:
+```bash
 pip install -r requirements.txt
-
-2. Run server:
-uvicorn app:app --reload
-
-3. Setup webhook using ngrok
-
-## Author
-Girivardhan Reddy
+python create_vector_db.py
+python app.py
