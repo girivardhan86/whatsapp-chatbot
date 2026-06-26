@@ -49,7 +49,18 @@ def ingest_file(file_path, user_id="default"):
         ).load()
 
     elif file_path.endswith(".pdf"):
+
         docs = PyPDFLoader(file_path).load()
+
+        print("PDF Pages:", len(docs))
+
+        for i, d in enumerate(docs):
+            print(f"Page {i+1}: {len(d.page_content)} characters")
+
+        docs = [
+            d for d in docs
+            if d.page_content.strip()
+        ]
 
     elif file_path.endswith(".docx"):
 
@@ -136,17 +147,32 @@ def ingest_url(url, user_id="default"):
         print("❌ URL Error:", e)
 
 # ================= STORE DOCS =================
+# ================= STORE DOCS =================
 def _store_docs(docs, user_id):
+
+    if not docs:
+        print("❌ No documents found.")
+        return
 
     splitter = get_splitter()
 
     split_docs = splitter.split_documents(docs)
 
+    # Remove empty chunks
+    split_docs = [
+        d for d in split_docs
+        if d.page_content and d.page_content.strip()
+    ]
+
+    if len(split_docs) == 0:
+        print("❌ No text found in document.")
+        return
+
     db = get_db(user_id)
 
     db.add_documents(split_docs)
 
-    print("✅ Stored in vector DB")
+    print(f"✅ Stored {len(split_docs)} chunks in vector DB")
 
 # ================= RETRIEVER =================
 def get_retriever(user_id="default"):

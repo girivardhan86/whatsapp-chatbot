@@ -14,12 +14,19 @@ from langchain_openai import ChatOpenAI
 # =====================================================
 import os
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+from dotenv import load_dotenv
+import os
+from langchain_openai import ChatOpenAI
+
+load_dotenv()
+
+import os
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 llm = ChatOpenAI(
     model="openai/gpt-4o-mini",
     temperature=0.3,
     openai_api_base="https://openrouter.ai/api/v1"
 )
-
 # =====================================================
 # SEARCH TOOL
 # =====================================================
@@ -43,7 +50,7 @@ def handle_basic_messages(query):
     q = query.lower().strip()
 
     if q in ["hi", "hello", "hey"]:
-        return "Hello 👋 Welcome to Agneyra."
+        return "Hello buddy👋"
 
     if "thank" in q:
         return "You're welcome 😊"

@@ -14,7 +14,9 @@ from create_vector_db import (
 from weather import get_weather
 from news import get_news
 # ================= CONFIG =================
-
+ACCESS_TOKEN = "EAAMfxBVMu54BQZChnO8naLT1X0GZBmbK4Gp2fLr9PpMetBkALSvoRmjZCWbfcE15LIS4UhSbRBiUDOJAxcZBOXdoUWdTqq5pOhZAFKWtUCDSmHlKOWChbIuHBX7NDipZB6gGbaNvZCMYAz96MITi46fEHQKWyENPtuqoOAqUOegU6C39wsfLzesvslPyxBs8hINygZDZD"
+PHONE_NUMBER_ID = "948319965041875"
+VERIFY_TOKEN = "agneyra123"
 # ================= INIT =================
 message_queue = queue.Queue()
 app = Flask(__name__)
