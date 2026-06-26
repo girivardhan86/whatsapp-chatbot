@@ -1,6 +1,6 @@
 🤖 AI Chat Assistant
 OpenRouter LLM integration (GPT-4o Mini)
-Context-aware conversations
+Context-aware conversations   
 Multi-turn chat memory
 Personalized responses
 📚 RAG (Retrieval-Augmented Generation)
