@@ -1,45 +1,26 @@
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request
 from chatbot import get_response
 import requests
 import queue
 import threading
-from memory_db import init_db, save_message, get_chat_history, get_all_users
 import os
-import sqlite3
+from speech_to_text import speech_to_text
+from memory_db import init_db, save_message
 from create_vector_db import (
     ingest_file,
     ingest_image,
     ingest_url
 )
-from weather import get_weather
-from news import get_news
-# ================= CONFIG =================
-ACCESS_TOKEN = "EAAMfxBVMu54BQZChnO8naLT1X0GZBmbK4Gp2fLr9PpMetBkALSvoRmjZCWbfcE15LIS4UhSbRBiUDOJAxcZBOXdoUWdTqq5pOhZAFKWtUCDSmHlKOWChbIuHBX7NDipZB6gGbaNvZCMYAz96MITi46fEHQKWyENPtuqoOAqUOegU6C39wsfLzesvslPyxBs8hINygZDZD"
-PHONE_NUMBER_ID = "948319965041875"
-VERIFY_TOKEN = "agneyra123"
+
 # ================= INIT =================
 message_queue = queue.Queue()
 app = Flask(__name__)
 init_db()
 
-# ================= ADMIN PANEL =================
-@app.route("/admin")
-def admin():
-    phone = request.args.get("phone")
-
-    users = get_all_users()
-    if not phone and users:
-        phone = users[0][0]
-
-    messages = get_chat_history(phone) if phone else []
-
-    return render_template(
-        "admin.html",
-        all_users=users,
-        messages=messages,
-        phone=phone
-    )
-
+# ================= CONFIG =================
+ACCESS_TOKEN = ""
+PHONE_NUMBER_ID = ""
+VERIFY_TOKEN = ""
 # ================= HOME =================
 @app.route("/")
 def home():
@@ -74,7 +55,14 @@ def webhook():
         if msg["type"] == "text":
             message = msg["text"]["body"]
             message_queue.put((sender, "text", message))
+            # ================= AUDIO =================
+        elif msg["type"] == "audio":
 
+            audio_id = msg["audio"]["id"]
+
+            message_queue.put(
+                (sender, "audio", audio_id)
+            )
         # ================= IMAGE =================
         elif msg["type"] == "image":
             image_id = msg["image"]["id"]
@@ -96,22 +84,39 @@ def webhook():
     return "ok", 200
 
 def download_media(media_id, filename):
+
     url = f"https://graph.facebook.com/v19.0/{media_id}"
 
     headers = {
         "Authorization": f"Bearer {ACCESS_TOKEN}"
     }
 
+    # Get download URL
     res = requests.get(url, headers=headers).json()
     media_url = res.get("url")
 
     if not media_url:
         return None
 
-    file_data = requests.get(media_url, headers=headers).content
+    # Download file
+    file_data = requests.get(
+        media_url,
+        headers=headers
+    ).content
 
     os.makedirs("uploads", exist_ok=True)
-    filepath = f"uploads/{filename}"
+
+    # Keep original extension
+    ext = os.path.splitext(filename)[1]
+
+    # WhatsApp audio often has no filename
+    if ext == "":
+        ext = ".ogg"
+
+    filepath = os.path.join(
+        "uploads",
+        filename if filename.endswith(ext) else filename + ext
+    )
 
     with open(filepath, "wb") as f:
         f.write(file_data)
@@ -241,7 +246,29 @@ def process_messages():
                 if filepath:
                     ingest_image(filepath, sender)
                     send_whatsapp_message(sender, "✅ Image processed. Ask questions now.")
+                # ================= AUDIO =================
+                elif msg_type == "audio":
 
+                    filepath = download_media(
+                        content,
+                        f"{sender}.ogg"
+                    )
+
+                    if filepath:
+
+                        text = speech_to_text(filepath)
+
+                        print("Voice Text:", text)
+
+                        reply = get_response(
+                            text,
+                            sender
+                        )
+
+                        send_whatsapp_message(
+                            sender,
+                            reply
+                        )
             # ================= DOCUMENT =================
             elif msg_type == "document":
 

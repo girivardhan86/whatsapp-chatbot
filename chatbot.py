@@ -3,29 +3,26 @@ from memory_db import save_message
 
 from weather import get_weather
 from news import get_news
-
 from langchain_community.tools import DuckDuckGoSearchRun
 import wikipedia
-
-from langchain_openai import ChatOpenAI
 
 # =====================================================
 # OPENROUTER LLM
 # =====================================================
+
+
 import os
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 from dotenv import load_dotenv
 import os
 from langchain_openai import ChatOpenAI
 
 load_dotenv()
 
-import os
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 llm = ChatOpenAI(
     model="openai/gpt-4o-mini",
     temperature=0.3,
-    openai_api_base="https://openrouter.ai/api/v1"
+    base_url="https://openrouter.ai/api/v1",
+    api_key="openrouter_key",
 )
 # =====================================================
 # SEARCH TOOL
